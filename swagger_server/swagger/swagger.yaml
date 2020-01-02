@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  title: Drift Calculator
+  description: Calculates the drift in the data sets.
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /api/v1/calculate_drift:
+    post:
+      tags:
+      - drift_calculator
+      summary: Calculates Drift basis the test type provided in the input on the data.
+      operationId: api_v1_calculate_drift_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/driftRequestPostBody'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/driftResponse'
+        "400":
+          description: Failed. Bad post data.
+      x-openapi-router-controller: swagger_server.controllers.drift_calculator_controller
+components:
+  schemas:
+    chi2InputData:
+      required:
+      - x
+      - "y"
+      type: object
+      properties:
+        x:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+        y:
+          type: array
+          items:
+            type: number
+    ksInputData:
+      required:
+      - cdf
+      - rvs
+      type: object
+      properties:
+        rvs:
+          type: array
+          items:
+            type: number
+        cdf:
+          type: string
+    klInputData:
+      required:
+      - x
+      - "y"
+      type: object
+      properties:
+        x:
+          type: array
+          items:
+            type: number
+        y:
+          type: array
+          items:
+            type: number
+    driftRequestPostBody:
+      required:
+      - input_data
+      - test_type
+      type: object
+      properties:
+        test_type:
+          type: string
+          enum:
+          - kl
+          - ks
+          - chi2
+        input_data:
+          $ref: '#/components/schemas/driftAlgoInputsData'
+    driftAlgoInputsData:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/chi2InputData'
+      - $ref: '#/components/schemas/klInputData'
+      - $ref: '#/components/schemas/ksInputData'
+    driftResponse:
+      required:
+      - divergence
+      type: object
+      properties:
+        divergence:
+          type: array
+          items:
+            type: number
+        p-value:
+          type: array
+          items:
+            type: number
+      example:
+        divergence:
+        - 0.8008281904610115
+        - 0.8008281904610115
+        p-value:
+        - 6.027456183070403
+        - 6.027456183070403
+

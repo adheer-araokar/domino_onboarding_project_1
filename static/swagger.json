@@ -1,0 +1,146 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Calculates the drift in the data sets.",
+    "version": "1.0.0",
+    "title": "Drift Calculator"
+  },
+  "paths": {
+    "/api/v1/calculate_drift": {
+      "post": {
+        "tags": [
+          "drift_calculator"
+        ],
+        "summary": "Calculates Drift basis the test type provided in the input on the data.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/driftRequestPostBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/driftResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed. Bad post data."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "chi2InputData": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "y": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": ["x", "y"]
+      },
+      "ksInputData": {
+        "type": "object",
+        "properties": {
+          "rvs": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "cdf": {
+            "type": "string"
+          }
+        },
+        "required": ["rvs", "cdf"]
+      },
+      "klInputData": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "y": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": ["x", "y"]
+      },
+      "driftRequestPostBody": {
+        "type": "object",
+        "required": ["test_type", "input_data"],
+        "properties": {
+          "test_type": {
+            "type": "string",
+            "enum": ["kl", "ks", "chi2"]
+          },
+          "input_data": {
+            "$ref": "#/components/schemas/driftAlgoInputsData"
+          }
+        }
+      },
+      "driftAlgoInputsData": {
+        "type": "object",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/chi2InputData"
+              },
+              {
+                "$ref": "#/components/schemas/klInputData"
+              },
+              {
+                "$ref": "#/components/schemas/ksInputData"
+              }
+            ]
+      },
+      "driftResponse": {
+        "type": "object",
+        "required": ["divergence"],
+        "properties": {
+          "divergence": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "p-value": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    }
+  }
+}
