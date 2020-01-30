@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: drift-calculator
+  labels:
+    app: drift-calculator
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+  selector:
+    app: drift-calculator
+  externalIPs:
+  - 192.168.64.2
